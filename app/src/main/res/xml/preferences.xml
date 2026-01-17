@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <CheckBoxPreference
+        android:key="show_system_apps"
+        android:title="Показывать системные приложения"
+        android:summary="Если включено, системные приложения будут отображаться в списке"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="hide_app_icon"
+        android:title="Скрыть значок приложения"
+        android:summary="Скрывает значок приложения из списка приложений"
+        android:defaultValue="false" />
+</PreferenceScreen>

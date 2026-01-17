@@ -1,0 +1,51 @@
+<resources>
+
+    <style name="Theme.Leanback" parent="Theme.Leanback.Browse">
+    </style>
+
+    <!-- NumberPicker Theme for TV -->
+    <style name="NumberPickerTheme">
+        <item name="android:textColorPrimary">@color/tv_text_primary</item>
+        <item name="android:textColorSecondary">@color/tv_text_secondary</item>
+        <item name="android:colorControlNormal">@color/tv_accent</item>
+    </style>
+
+    <!-- TV Button Styles -->
+    <style name="TVButton" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@color/tv_text_primary</item>
+        <item name="android:background">@color/tv_card_background</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="TVButtonColored" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:backgroundTint">@color/tv_accent</item>
+        <item name="android:textColor">@color/tv_text_primary</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <!-- PIN Button Styles -->
+    <style name="PinButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/tv_text_primary</item>
+        <item name="android:background">@color/tv_card_background</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="PinButtonSecondary" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/tv_text_secondary</item>
+        <item name="android:background">@color/tv_divider</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+    <color name="background_gradient_start">#000000</color>
+    <color name="background_gradient_end">#222222</color>
+    <color name="fastlane_background">#0096a6</color>
+    <color name="search_opaque">#ffaa3f</color>
+    <color name="selected_background">#ffaa3f</color>
+    <color name="default_background">#3d3d3d</color>
+    
+    <!-- TV App Colors -->
+    <color name="tv_background">#1E1E1E</color>
+    <color name="tv_text_primary">#FFFFFF</color>
+    <color name="tv_text_secondary">#CCCCCC</color>
+    <color name="tv_accent">#0096a6</color>
+    <color name="tv_card_background">#2D2D2D</color>
+    <color name="tv_divider">#404040</color>
+    <color name="tv_button_normal">#333333</color>
+    <color name="tv_button_focused">#555555</color>
+    
+    <!-- Status Colors -->
+    <color name="status_ok">#4CAF50</color>
+    <color name="status_warning">#FF9800</color>
+    <color name="status_danger">#F44336</color>
+</resources>
