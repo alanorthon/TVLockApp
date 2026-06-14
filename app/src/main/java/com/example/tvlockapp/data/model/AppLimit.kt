@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "app_limits")
 data class AppLimit(
     @PrimaryKey val packageName: String,
-    var dailyUsageLimit: Long,
-    var isBlocked: Boolean = false
+    val dailyUsageLimit: Long,
+    val isBlocked: Boolean = false
 )

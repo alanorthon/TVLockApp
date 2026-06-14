@@ -1,5 +1,4 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
         android:key="show_system_apps"
         android:title="Показывать системные приложения"
@@ -10,4 +9,8 @@
         android:title="Скрыть значок приложения"
         android:summary="Скрывает значок приложения из списка приложений"
         android:defaultValue="false" />
+    <Preference
+        android:key="change_pin"
+        android:title="Сменить PIN-код"
+        android:summary="Изменить текущий PIN-код для входа в приложение" />
 </PreferenceScreen>

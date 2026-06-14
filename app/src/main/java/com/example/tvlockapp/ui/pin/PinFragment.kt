@@ -18,14 +18,14 @@ class PinFragment : Fragment() {
     private lateinit var titleText: TextView
     private lateinit var instructionText: TextView
     private var currentPin = ""
-    private var mode = "setup" // setup, verify, confirm
+    private var mode: PinMode = PinMode.SETUP
     private var firstPin = ""
 
     companion object {
-        fun newInstance(mode: String): PinFragment {
+        fun newInstance(mode: PinMode): PinFragment {
             val fragment = PinFragment()
             val args = Bundle()
-            args.putString("mode", mode)
+            args.putSerializable(PinMode.EXTRA_MODE, mode)
             fragment.arguments = args
             return fragment
         }
@@ -40,110 +40,116 @@ class PinFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        mode = arguments?.getString("mode") ?: "setup"
-        
+
+        mode = (arguments?.getSerializable(PinMode.EXTRA_MODE) as? PinMode) ?: PinMode.SETUP
+
         pinDisplay = view.findViewById(R.id.pin_display)
         titleText = view.findViewById(R.id.title_text)
         instructionText = view.findViewById(R.id.instruction_text)
-        
+
         setupUI()
         setupNumberButtons(view)
         setupActionButtons(view)
     }
-    
+
     private fun setupUI() {
         when (mode) {
-            "setup" -> {
+            PinMode.SETUP, PinMode.CHANGE -> {
                 titleText.text = "Установка PIN-кода"
                 instructionText.text = "Введите 4-значный PIN-код"
             }
-            "verify" -> {
+            PinMode.VERIFY -> {
                 titleText.text = "Вход в приложение"
                 instructionText.text = "Введите PIN-код"
             }
-            "confirm" -> {
+            PinMode.CONFIRM -> {
                 titleText.text = "Подтверждение PIN-кода"
                 instructionText.text = "Повторите PIN-код"
             }
         }
     }
-    
+
     private fun setupNumberButtons(view: View) {
         val buttonIds = arrayOf(
             R.id.btn_0, R.id.btn_1, R.id.btn_2, R.id.btn_3, R.id.btn_4,
             R.id.btn_5, R.id.btn_6, R.id.btn_7, R.id.btn_8, R.id.btn_9
         )
-        
+
         buttonIds.forEachIndexed { index, buttonId ->
             view.findViewById<Button>(buttonId).setOnClickListener {
                 addDigit(index.toString())
             }
         }
     }
-    
+
     private fun setupActionButtons(view: View) {
         view.findViewById<Button>(R.id.btn_clear).setOnClickListener {
             clearPin()
         }
-        
+
         view.findViewById<Button>(R.id.btn_delete).setOnClickListener {
             deleteLastDigit()
         }
     }
-    
+
     private fun addDigit(digit: String) {
         if (currentPin.length < 4) {
             currentPin += digit
             updatePinDisplay()
-            
+
             if (currentPin.length == 4) {
                 handlePinComplete()
             }
         }
     }
-    
+
     private fun deleteLastDigit() {
         if (currentPin.isNotEmpty()) {
             currentPin = currentPin.dropLast(1)
             updatePinDisplay()
         }
     }
-    
+
     private fun clearPin() {
         currentPin = ""
         updatePinDisplay()
     }
-    
+
     private fun updatePinDisplay() {
         pinDisplay.text = "*".repeat(currentPin.length) + "_".repeat(4 - currentPin.length)
     }
-    
+
     private fun handlePinComplete() {
         when (mode) {
-            "setup" -> {
+            PinMode.SETUP, PinMode.CHANGE -> {
                 firstPin = currentPin
-                mode = "confirm"
+                mode = PinMode.CONFIRM
                 currentPin = ""
                 setupUI()
                 updatePinDisplay()
             }
-            "confirm" -> {
+            PinMode.CONFIRM -> {
                 if (currentPin == firstPin) {
                     PinManager.setPin(requireContext(), currentPin)
-                    Toast.makeText(context, "PIN-код установлен", Toast.LENGTH_SHORT).show()
+                    val message = if (mode == PinMode.CONFIRM) {
+                        // Distinguish between new setup and change
+                        "PIN-код установлен"
+                    } else {
+                        "PIN-код изменён"
+                    }
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     requireActivity().setResult(Activity.RESULT_OK)
                     requireActivity().finish()
                 } else {
                     Toast.makeText(context, "PIN-коды не совпадают", Toast.LENGTH_SHORT).show()
-                    mode = "setup"
+                    mode = PinMode.SETUP
                     currentPin = ""
                     firstPin = ""
                     setupUI()
                     updatePinDisplay()
                 }
             }
-            "verify" -> {
+            PinMode.VERIFY -> {
                 val savedPin = PinManager.getPin(requireContext())
                 if (currentPin == savedPin) {
                     requireActivity().setResult(Activity.RESULT_OK)

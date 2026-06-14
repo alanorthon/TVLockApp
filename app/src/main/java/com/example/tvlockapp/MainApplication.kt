@@ -18,16 +18,19 @@ class MainApplication : Application() {
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .build()
 
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-
-        if (calendar.before(Calendar.getInstance())) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        val now = Calendar.getInstance()
+        val midnight = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 
-        val initialDelay = calendar.timeInMillis - System.currentTimeMillis()
+        if (midnight.before(now)) {
+            midnight.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        val initialDelay = midnight.timeInMillis - now.timeInMillis
 
         val dailyResetRequest = PeriodicWorkRequestBuilder<ResetAppLimitsWorker>(
             1, TimeUnit.DAYS
@@ -38,7 +41,7 @@ class MainApplication : Application() {
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "daily_reset_worker",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             dailyResetRequest
         )
     }

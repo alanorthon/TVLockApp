@@ -22,6 +22,6 @@ interface AppLimitDao {
     @Query("UPDATE app_limits SET isBlocked = 0")
     fun resetAllBlocks()
 
-    @Query("DELETE FROM app_limits")
+    @Query("UPDATE app_limits SET isBlocked = 0")
     fun resetAllAppLimits()
 }

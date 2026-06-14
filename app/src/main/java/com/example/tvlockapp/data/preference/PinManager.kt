@@ -1,6 +1,7 @@
 package com.example.tvlockapp.data.preference
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 
@@ -9,7 +10,7 @@ object PinManager {
     private const val PREF_NAME = "pin_prefs"
     private const val KEY_PIN = "pin"
 
-    private fun getEncryptedSharedPreferences(context: Context): EncryptedSharedPreferences {
+    private fun getEncryptedSharedPreferences(context: Context): SharedPreferences {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         return EncryptedSharedPreferences.create(
             PREF_NAME,
@@ -17,7 +18,7 @@ object PinManager {
             context,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        ) as EncryptedSharedPreferences
+        )
     }
 
     fun setPin(context: Context, pin: String) {

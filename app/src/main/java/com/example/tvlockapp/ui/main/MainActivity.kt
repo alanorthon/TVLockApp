@@ -3,72 +3,89 @@ package com.example.tvlockapp.ui.main
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.example.tvlockapp.R
 import com.example.tvlockapp.data.preference.PinManager
 import com.example.tvlockapp.service.AppUsageService
 import com.example.tvlockapp.ui.pin.PinActivity
+import com.example.tvlockapp.ui.pin.PinMode
 
 class MainActivity : FragmentActivity() {
 
+    private val pinVerificationLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            initializeApp()
+        } else {
+            finish()
+        }
+    }
+
     override fun onBackPressed() {
-        // Instead of closing, move the task to the background
         moveTaskToBack(true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!hasUsageStatsPermission()) {
-            requestUsageStatsPermission()
+        if (!checkPermissions()) {
             return
         }
 
-        // Start the usage monitoring service
-        val serviceIntent = Intent(this, AppUsageService::class.java)
-        startService(serviceIntent)
+        startMonitoringService()
 
-        // Check if PIN is set
         if (!PinManager.isPinSet(this)) {
-            // First time launch - set PIN
-            val intent = Intent(this, PinActivity::class.java)
-            intent.putExtra("mode", "setup")
+            val intent = Intent(this, PinActivity::class.java).apply {
+                putExtra(PinMode.EXTRA_MODE, PinMode.SETUP)
+            }
             startActivity(intent)
             finish()
             return
         }
 
-        // PIN is set, verify it
-        val intent = Intent(this, PinActivity::class.java)
-        intent.putExtra("mode", "verify")
-        startActivityForResult(intent, PIN_VERIFICATION_REQUEST)
-    }
-    
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        
-        if (requestCode == PIN_VERIFICATION_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                // PIN verified successfully
-                initializeApp()
-            } else {
-                // PIN verification failed
-                finish()
-            }
+        val intent = Intent(this, PinActivity::class.java).apply {
+            putExtra(PinMode.EXTRA_MODE, PinMode.VERIFY)
         }
+        pinVerificationLauncher.launch(intent)
     }
-    
+
     private fun initializeApp() {
         setContentView(R.layout.activity_main)
-
-        // Load the main fragment
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_browse_fragment, MainFragment())
             .commitNow()
     }
-    
+
+    private fun startMonitoringService() {
+        val serviceIntent = Intent(this, AppUsageService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+    }
+
+    private fun checkPermissions(): Boolean {
+        if (!hasUsageStatsPermission()) {
+            requestUsageStatsPermission()
+            return false
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            requestOverlayPermission()
+            return false
+        }
+
+        return true
+    }
+
     private fun hasUsageStatsPermission(): Boolean {
         val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val mode = appOps.checkOpNoThrow(
@@ -80,12 +97,23 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun requestUsageStatsPermission() {
+        Toast.makeText(this, "Предоставьте доступ к статистике", Toast.LENGTH_LONG).show()
         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
         startActivity(intent)
-        finish()
     }
 
-    companion object {
-        private const val PIN_VERIFICATION_REQUEST = 1001
+    private fun requestOverlayPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Toast.makeText(this, "Разрешите отображение поверх других окон", Toast.LENGTH_LONG).show()
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }

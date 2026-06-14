@@ -11,7 +11,7 @@ class ResetAppLimitsWorker(appContext: Context, workerParams: WorkerParameters) 
     override suspend fun doWork(): Result {
         return try {
             val database = AppDatabase.getDatabase(applicationContext)
-            database.appLimitDao().resetAllAppLimits()
+            database.appLimitDao().resetAllBlocks()
             Result.success()
         } catch (e: Exception) {
             Result.failure()
